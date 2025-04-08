@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <h1>Task Manager</h1>
+        <form @submit.prevent="addOrUpdateTask">
+            <input v-model="task.title" type="text" placeholder="Enter task title" required>
+            <input v-model="task.description" type="text" placeholder="Enter task description" required>
+            <input v-model="task.deadline" type="date" required>
+            <select v-model="task.priority" required>
+                <option disabled value="">Select priority</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+            </select>
+            <button type="submit" :class="{'button-update': editingIndex !== -1, 'button-add': editingIndex === -1}">
+                {{ editingIndex !== -1 ? 'Update' : 'Add' }} Task
+            </button>
+        </form>
+        <table>
+            <thead>
+                <tr>
+                    <th>Task</th>
+                    <th>Description</th>
+                    <th>Deadline</th>
+                    <th>Priority</th>
+                    <th>Complete?</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(item, index) in tasks" :key="index">
+                    <td>{{ item.title }}</td>
+                    <td>{{ item.description }}</td>
+                    <td>{{ item.deadline }}</td>
+                    <td>{{ item.priority }}</td>
+                    <td><input type="checkbox" v-model="item.isComplete"></td>
+                    <td>
+                        <button @click="editTask(index)" class="button-edit">Edit</button>
+                        <button @click="deleteTask(index)" class="button-delete">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+    new Vue({
+        el: '#app',
+        data: {
+            tasks: [],
+            task: { title: '', description: '', deadline: '', priority: '', isComplete: false },
+            editingIndex: -1
+        },
+        methods: {
+            addOrUpdateTask() {
+                if (this.editingIndex === -1) {
+                    this.tasks.push({...this.task, isComplete: false});
+                } else {
+                    Vue.set(this.tasks, this.editingIndex, {...this.task});
+                }
+                this.resetTask();
+            },
+            editTask(index) {
+                this.task = {...this.tasks[index]};
+                this.editingIndex = index;
+            },
+            deleteTask(index) {
+                this.tasks.splice(index, 1);
+            },
+            resetTask() {
+                this.task = { title: '', description: '', deadline: '', priority: '', isComplete: false };
+                this.editingIndex = -1;
+            }
+        }
+    });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+</body>
+</html>
